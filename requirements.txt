@@ -1,7 +1,6 @@
-streamlit>=1.25
-ultralytics>=8.0.0
-torch>=2.0.0
-opencv-python-headless
+ultralytics
+opencv-python-headless<4.10
+pillow
 numpy
-Pillow
+streamlit
 requests
