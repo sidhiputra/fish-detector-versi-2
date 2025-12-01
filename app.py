@@ -102,7 +102,7 @@ if mode == "Upload Image":
 
 
 # ---------- MODE REALTIME ----------
-elif mode == "Realtime Detection":
-    st.write("Klik tombol di bawah untuk mulai deteksi realtime menggunakan webcam.")
-    if st.button("Mulai Realtime"):
-        detect_realtime()
+# elif mode == "Realtime Detection":
+#     st.write("Klik tombol di bawah untuk mulai deteksi realtime menggunakan webcam.")
+#     if st.button("Mulai Realtime"):
+#         detect_realtime()
