@@ -4,16 +4,23 @@ from PIL import Image
 import cv2
 import numpy as np
 
-# ---------- CONFIG ----------
+# ============================================
+# CONFIG
+# ============================================
 MODEL_FILENAME = "weights/best.pt"
 MODEL_URL = st.secrets.get("MODEL_URL", None)
 
+st.set_page_config(page_title="Fish Freshness Detector", layout="wide")
+
+
+# ============================================
+# LOAD MODEL
+# ============================================
 @st.cache_resource
 def load_model():
     if MODEL_URL:
         from pathlib import Path
         path = Path(MODEL_FILENAME)
-
         if not path.exists():
             import requests
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -22,40 +29,112 @@ def load_model():
 
     return YOLO(MODEL_FILENAME)
 
+
 model = load_model()
 
 
-# ---------- DETEKSI GAMBAR ----------
+# ============================================
+# DETEKSI GAMBAR
+# ============================================
 def detect_image(image):
     results = model.predict(image, conf=0.25)
     annotated = results[0].plot()
-    annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)  # Perbaikan warna
+    annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)  # Fix warna
     return annotated
 
 
-# ---------- UI ----------
-st.title("🐟 Fish Freshness Detector (YOLOv8m)")
-st.write("Upload satu atau beberapa foto ikan untuk mendeteksi kesegaran.")
+# ============================================
+# UI HEADER
+# ============================================
+st.markdown(
+    """
+    <h1 style='text-align:center; color:#0A6C9F;'>
+        🐟 Fish Freshness Detector (YOLOv8m)
+    </h1>
 
+    <p style='text-align:center; font-size:18px;'>
+        Sistem deteksi otomatis untuk menentukan kesegaran ikan menggunakan model YOLOv8 Anda.
+    </p>
+
+    <hr style="border: 1px solid #ccc;">
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ============================================
+# PROSEDUR PENGGUNAAN
+# ============================================
+with st.expander("📘 **Prosedur Penggunaan Aplikasi**", expanded=True):
+    st.markdown(
+        """
+        **1. Siapkan foto ikan**  
+        - Ambil gambar ikan dari jarak yang cukup dekat  
+        - Pastikan area ikan terlihat jelas dan tidak blur  
+
+        **2. Upload gambar**  
+        - Tekan tombol **Upload gambar**  
+        - Anda bisa memilih **banyak gambar sekaligus**  
+
+        **3. Sistem akan otomatis melakukan deteksi**  
+        - Tidak perlu menekan tombol apa pun  
+        - Bounding box dan label akan muncul di setiap gambar  
+
+        **4. Baca hasil deteksi**  
+        - Periksa label seperti `fresh`, `not_fresh`, atau label lain sesuai model Anda  
+        - Semakin tinggi confidence → semakin kuat prediksinya  
+        """
+    )
+
+
+# ============================================
+# UPLOAD FILE
+# ============================================
+st.markdown("### 📤 Upload Foto Ikan")
 uploaded_files = st.file_uploader(
-    "Upload gambar ikan",
+    "Pilih satu atau beberapa gambar ikan",
     type=["jpg", "jpeg", "png"],
     accept_multiple_files=True
 )
 
-# ---------- PROSES ----------
+st.markdown("<br>", unsafe_allow_html=True)
+
+
+# ============================================
+# HASIL DETEKSI
+# ============================================
 if uploaded_files:
-    st.write(f"📸 Jumlah gambar ter-upload: **{len(uploaded_files)}**")
+    st.success(f"📸 {len(uploaded_files)} gambar berhasil di-upload.")
 
-    for file in uploaded_files:
-        st.subheader(f"Gambar: {file.name}")
+    # Grid responsive (2 kolom)
+    cols = st.columns(2)
 
+    for idx, file in enumerate(uploaded_files):
         img = Image.open(file).convert("RGB")
+        col = cols[idx % 2]
 
-        st.image(img, caption="Gambar asli", use_column_width=True)
+        with col:
+            st.markdown(
+                f"""
+                <div style="padding:10px; background:#F7F9FB; border-radius:10px;">
+                    <h4 style="color:#0A6C9F;">📎 {file.name}</h4>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-        with st.spinner("Mendeteksi..."):
-            result_img = detect_image(img)
+            st.image(img, caption="Gambar asli", use_column_width=True)
 
-        st.image(result_img, caption="Hasil deteksi", use_column_width=True)
-        st.markdown("---")
+            with st.spinner("Mendeteksi..."):
+                detected = detect_image(img)
+
+            st.image(
+                detected,
+                caption="Hasil Deteksi",
+                use_column_width=True
+            )
+
+            st.markdown("---")
+
+else:
+    st.info("Silakan upload gambar untuk mulai deteksi.")
