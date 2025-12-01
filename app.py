@@ -81,7 +81,7 @@ with st.expander("📘 **Prosedur Penggunaan Aplikasi**", expanded=True):
         - Bounding box dan label akan muncul di setiap gambar  
 
         **4. Baca hasil deteksi**  
-        - Periksa label seperti `Fresh-Eye', 'Fresh-Skin', 'NonFresh-Eye', 'NonFresh-Skin', 'VeryFresh-Eye', 'VeryFresh-Skin'  
+        - Periksa label seperti `Fresh-Eye`, `Fresh-Skin`, `NonFresh-Eye`, `NonFresh-Skin`, `VeryFresh-Eye`, `VeryFresh-Skin`  
         - Semakin tinggi confidence → semakin kuat prediksinya  
         """
     )
