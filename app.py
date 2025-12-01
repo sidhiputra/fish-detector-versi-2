@@ -84,6 +84,7 @@ if mode == "Upload Image":
         if st.button("Deteksi"):
             with st.spinner("Mendeteksi..."):
                 result_img = detect_image(img)
+                result_img = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
                 st.image(result_img, caption="Hasil deteksi", use_column_width=True)
 
 # ---------- MODE REALTIME ----------
