@@ -35,37 +35,37 @@ def detect_image(image):
 
 
 # ---------- DETEKSI REALTIME ----------
-def detect_realtime():
-    st.info("Mengaktifkan kamera... Klik STOP untuk menghentikan.")
+# def detect_realtime():
+#     st.info("Mengaktifkan kamera... Klik STOP untuk menghentikan.")
 
-    camera = cv2.VideoCapture(0)
+#     camera = cv2.VideoCapture(0)
 
-    if not camera.isOpened():
-        st.error("❌ Kamera tidak ditemukan.")
-        return
+#     if not camera.isOpened():
+#         st.error("❌ Kamera tidak ditemukan.")
+#         return
 
-    frame_window = st.image([])
+#     frame_window = st.image([])
 
-    stop_button = st.button("STOP")
+#     stop_button = st.button("STOP")
 
-    while True:
-        ret, frame = camera.read()
-        if not ret:
-            st.warning("Gagal membaca frame kamera")
-            break
+#     while True:
+#         ret, frame = camera.read()
+#         if not ret:
+#             st.warning("Gagal membaca frame kamera")
+#             break
 
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        results = model.predict(rgb, conf=0.25)
-        annotated = results[0].plot()
-        annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
+#         results = model.predict(rgb, conf=0.25)
+#         annotated = results[0].plot()
+#         annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
 
-        frame_window.image(annotated, channels="RGB")
+#         frame_window.image(annotated, channels="RGB")
 
-        if stop_button:
-            break
+#         if stop_button:
+#             break
 
-    camera.release()
+#     camera.release()
 
 
 # ---------- UI ----------
