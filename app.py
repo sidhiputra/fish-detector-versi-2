@@ -30,6 +30,7 @@ model = load_model()
 def detect_image(image):
     results = model.predict(image, conf=0.25)
     annotated = results[0].plot()
+    annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)  # perbaikan warna
     return annotated
 
 
@@ -45,23 +46,23 @@ def detect_realtime():
 
     frame_window = st.image([])
 
+    stop_button = st.button("STOP")
+
     while True:
         ret, frame = camera.read()
         if not ret:
             st.warning("Gagal membaca frame kamera")
             break
 
-        # Konversi ke RGB
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Prediksi YOLO
         results = model.predict(rgb, conf=0.25)
         annotated = results[0].plot()
+        annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
 
         frame_window.image(annotated, channels="RGB")
 
-        # Tombol stop
-        if st.button("STOP"):
+        if stop_button:
             break
 
     camera.release()
@@ -73,19 +74,32 @@ st.write("Detect kesegaran ikan menggunakan model YOLOv8 Anda.")
 
 mode = st.radio("Pilih Mode:", ["Upload Image", "Realtime Detection"])
 
+
 # ---------- MODE UPLOAD ----------
 if mode == "Upload Image":
-    uploaded = st.file_uploader("Upload foto ikan", type=["jpg", "jpeg", "png"])
+    uploaded_files = st.file_uploader(
+        "Upload satu atau beberapa gambar ikan",
+        type=["jpg", "jpeg", "png"],
+        accept_multiple_files=True
+    )
 
-    if uploaded:
-        img = Image.open(uploaded)
-        st.image(img, caption="Gambar asli", use_column_width=True)
+    if uploaded_files:
+        st.write(f"📸 Jumlah gambar: **{len(uploaded_files)}**")
 
-        if st.button("Deteksi"):
+        for file in uploaded_files:
+            st.subheader(f"Gambar: {file.name}")
+
+            img = Image.open(file)
+            img = img.convert("RGB")
+
+            st.image(img, caption="Gambar asli", use_column_width=True)
+
             with st.spinner("Mendeteksi..."):
                 result_img = detect_image(img)
-                result_img = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
-                st.image(result_img, caption="Hasil deteksi", use_column_width=True)
+
+            st.image(result_img, caption="Hasil deteksi", use_column_width=True)
+            st.markdown("---")
+
 
 # ---------- MODE REALTIME ----------
 elif mode == "Realtime Detection":
