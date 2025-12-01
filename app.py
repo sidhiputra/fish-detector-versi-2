@@ -1,5 +1,4 @@
 import streamlit as st
-import torch
 from ultralytics import YOLO
 from PIL import Image
 import cv2
@@ -30,79 +29,33 @@ model = load_model()
 def detect_image(image):
     results = model.predict(image, conf=0.25)
     annotated = results[0].plot()
-    annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)  # perbaikan warna
+    annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)  # Perbaikan warna
     return annotated
-
-
-# ---------- DETEKSI REALTIME ----------
-# def detect_realtime():
-#     st.info("Mengaktifkan kamera... Klik STOP untuk menghentikan.")
-
-#     camera = cv2.VideoCapture(0)
-
-#     if not camera.isOpened():
-#         st.error("❌ Kamera tidak ditemukan.")
-#         return
-
-#     frame_window = st.image([])
-
-#     stop_button = st.button("STOP")
-
-#     while True:
-#         ret, frame = camera.read()
-#         if not ret:
-#             st.warning("Gagal membaca frame kamera")
-#             break
-
-#         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-#         results = model.predict(rgb, conf=0.25)
-#         annotated = results[0].plot()
-#         annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
-
-#         frame_window.image(annotated, channels="RGB")
-
-#         if stop_button:
-#             break
-
-#     camera.release()
 
 
 # ---------- UI ----------
 st.title("🐟 Fish Freshness Detector (YOLOv8m)")
-st.write("Detect kesegaran ikan menggunakan model YOLOv8 Anda.")
+st.write("Upload satu atau beberapa foto ikan untuk mendeteksi kesegaran.")
 
-mode = st.radio("Pilih Mode:", ["Upload Image", "Realtime Detection"])
+uploaded_files = st.file_uploader(
+    "Upload gambar ikan",
+    type=["jpg", "jpeg", "png"],
+    accept_multiple_files=True
+)
 
+# ---------- PROSES ----------
+if uploaded_files:
+    st.write(f"📸 Jumlah gambar ter-upload: **{len(uploaded_files)}**")
 
-# ---------- MODE UPLOAD ----------
-if mode == "Upload Image":
-    uploaded_files = st.file_uploader(
-        "Upload satu atau beberapa gambar ikan",
-        type=["jpg", "jpeg", "png"],
-        accept_multiple_files=True
-    )
+    for file in uploaded_files:
+        st.subheader(f"Gambar: {file.name}")
 
-    if uploaded_files:
-        st.write(f"📸 Jumlah gambar: **{len(uploaded_files)}**")
+        img = Image.open(file).convert("RGB")
 
-        for file in uploaded_files:
-            st.subheader(f"Gambar: {file.name}")
+        st.image(img, caption="Gambar asli", use_column_width=True)
 
-            img = Image.open(file)
-            img = img.convert("RGB")
+        with st.spinner("Mendeteksi..."):
+            result_img = detect_image(img)
 
-            st.image(img, caption="Gambar asli", use_column_width=True)
-
-            with st.spinner("Mendeteksi..."):
-                result_img = detect_image(img)
-
-            st.image(result_img, caption="Hasil deteksi", use_column_width=True)
-            st.markdown("---")
-
-
-# ---------- MODE REALTIME ----------
-# elif mode == "Realtime Detection":
-#     st.write("Klik tombol di bawah untuk mulai deteksi realtime menggunakan webcam.")
-#     if st.button("Mulai Realtime"):
-#         detect_realtime()
+        st.image(result_img, caption="Hasil deteksi", use_column_width=True)
+        st.markdown("---")
