@@ -53,7 +53,7 @@ st.markdown(
     </h1>
 
     <p style='text-align:center; font-size:18px;'>
-        Sistem deteksi otomatis untuk menentukan kesegaran ikan menggunakan model YOLOv8 Anda.
+        Sistem deteksi otomatis untuk menentukan kesegaran ikan menggunakan model YOLOv8m.
     </p>
 
     <hr style="border: 1px solid #ccc;">
