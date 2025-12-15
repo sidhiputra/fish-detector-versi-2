@@ -7,7 +7,7 @@ import numpy as np
 # ============================================
 # CONFIG
 # ============================================
-MODEL_FILENAME = "weights/best.pt"
+MODEL_FILENAME = "weights/best_yolov8medium.pt"
 MODEL_URL = st.secrets.get("MODEL_URL", None)
 
 st.set_page_config(page_title="Fish Freshness Detector", layout="wide")
